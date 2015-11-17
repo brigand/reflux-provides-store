@@ -1,0 +1,30 @@
+{
+  "name": "reflux-provides-store",
+  "version": "0.1.0",
+  "description": "high order component for reflux store bindings",
+  "main": "lib/providesStore.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublish": "babel src --out-dir lib"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/brigand/reflux-provides-store.git"
+  },
+  "keywords": [
+    "reflux",
+    "react",
+    "flux",
+    "hoc",
+    "high-order-component"
+  ],
+  "author": "Frankie Bagnardi <f.bagnardi@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/brigand/reflux-provides-store/issues"
+  },
+  "homepage": "https://github.com/brigand/reflux-provides-store#readme",
+  "devDependencies": {
+    "babel": "^5.8.34"
+  }
+}
