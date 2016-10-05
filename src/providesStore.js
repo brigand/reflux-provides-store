@@ -1,15 +1,15 @@
 import React, {PropTypes} from 'react';
 
-export default function providesStore(store, Component){
+export default function providesStore(store, Component, selectors=null){
   if (arguments.length < 2) return providesStore.bind(null, store);
 
-  let propName = store.name || 'store';
   var propTypes = Component.propTypes || {};
   var matchedPropName = Object.keys(propTypes).find((key) => {
     return propTypes[key] && propTypes[key]._refluxStore === store;
   });
-  if (matchedPropName) {
-    propName = matchedPropName;
+
+  if (selectors === null) {
+    selectors = { [store.name || matchedPropName || 'store']: store => store };
   }
 
   return class StoreProvider extends React.Component {
@@ -28,10 +28,14 @@ export default function providesStore(store, Component){
       this.unsubscribe();
     }
     render(){
+      let selectedProps = Object.keys(selectors).reduce((props, propName) => {
+        return Object.assign(props, {[propName]: selectors[propName](this.state.storeState)});
+      }, {});
+
       return (
         <Component
           {...this.props}
-          {...{[propName]: this.state.storeState}}
+          {...selectedProps}
         />
       );
     }
