@@ -1,6 +1,6 @@
 import React, {PropTypes} from 'react';
 
-export default function providesStore(store, Component, selectors=null){
+export default function providesStore(store, Component, selector=null){
   if (arguments.length < 2) return providesStore.bind(null, store);
 
   var propTypes = Component.propTypes || {};
@@ -8,34 +8,36 @@ export default function providesStore(store, Component, selectors=null){
     return propTypes[key] && propTypes[key]._refluxStore === store;
   });
 
-  if (selectors === null) {
-    selectors = { [store.name || matchedPropName || 'store']: store => store };
+  const storeName = store.name || matchedPropName || 'store';
+  const componentName = Component.displayName || Component.name || 'Component'
+
+  if (selector === null) {
+    selector = (state) => {[storeName]: state};
   }
 
   return class StoreProvider extends React.Component {
     constructor(){
       super();
-      this.state = {
-        storeState: store.getState ? store.getState() : undefined,
-      };
+      this.state = { storeState: store.getState ? store.getState() : undefined };
     }
+
+    static displayName() { return `Provides(${storeName})(${componentName})`};
+
     componentDidMount(){
       this.unsubscribe = store.listen((storeState) => {
         this.setState({storeState});
       });
     }
+
     componentWillUnmount(){
       this.unsubscribe();
     }
-    render(){
-      let selectedProps = Object.keys(selectors).reduce((props, propName) => {
-        return Object.assign(props, {[propName]: selectors[propName](this.state.storeState)});
-      }, {});
 
+    render(){
       return (
         <Component
           {...this.props}
-          {...selectedProps}
+          {...selector(this.state.storeState)}
         />
       );
     }
