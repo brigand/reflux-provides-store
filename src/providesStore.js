@@ -12,7 +12,7 @@ export default function providesStore(store, Component, selector=null){
   const componentName = Component.displayName || Component.name || 'Component'
 
   if (selector === null) {
-    selector = (state) => {[storeName]: state};
+    selector = (state) => ({[storeName]: state});
   }
 
   return class StoreProvider extends React.Component {
