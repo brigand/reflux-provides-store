@@ -9,7 +9,7 @@ export default function providesStore(store, Component, selector=null){
   });
 
   const storeName = store.name || matchedPropName || 'store';
-  const componentName = Component.displayName || Component.name || 'Component'
+  const componentName = Component.displayName || Component.name || 'Component';
 
   if (selector === null) {
     selector = (state) => ({[storeName]: state});
@@ -18,7 +18,7 @@ export default function providesStore(store, Component, selector=null){
   return class StoreProvider extends React.Component {
     constructor(){
       super();
-      this.state = { storeState: store.getState ? store.getState() : undefined };
+      this.state = { storeState: store.getInitialState ? store.getInitialState() : undefined };
     }
 
     static displayName() { return `Provides(${storeName})(${componentName})`};
