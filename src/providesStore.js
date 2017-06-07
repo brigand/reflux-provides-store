@@ -1,52 +1,42 @@
-import React, {PropTypes} from 'react';
+import React from 'react';
 
-export default function providesStore(store, Component, selector=null){
+export default function providesStore(store, Component, selector = null) {
   if (arguments.length < 2) return providesStore.bind(null, store);
 
-  var propTypes = Component.propTypes || {};
-  var matchedPropName = Object.keys(propTypes).find((key) => {
-    return propTypes[key] && propTypes[key]._refluxStore === store;
-  });
-
-  const storeName = store.name || matchedPropName || 'store';
+  const storeName = store.name || 'store';
   const componentName = Component.displayName || Component.name || 'Component';
 
   if (selector === null) {
-    selector = (state) => ({[storeName]: state});
+    selector = state => ({ [storeName]: state });
   }
 
-  return class StoreProvider extends React.Component {
-    constructor(){
+  class StoreProvider extends React.Component {
+    displayName = `Provides(${storeName})(${componentName})`;
+
+    constructor() {
       super();
       this.state = { storeState: store.getInitialState ? store.getInitialState() : undefined };
     }
 
-    static displayName() { return `Provides(${storeName})(${componentName})`};
-
-    componentDidMount(){
-      this.unsubscribe = store.listen((storeState) => {
-        this.setState({storeState});
+    componentDidMount() {
+      this.unsubscribe = store.listen(storeState => {
+        this.setState({ storeState });
       });
     }
 
-    componentWillUnmount(){
+    componentWillUnmount() {
       this.unsubscribe();
     }
 
-    render(){
-      return (
-        <Component
-          {...this.props}
-          {...selector(this.state.storeState)}
-        />
-      );
+    render() {
+      return <Component {...this.props} {...selector(this.state.storeState)} />;
     }
-  };
+  }
+  return StoreProvider;
 }
 
-providesStore.getPropType = (store) => {
+providesStore.getPropType = store => {
   var type = (...args) => PropTypes.any(...args);
   type._refluxStore = store;
   return type;
-}
-
+};
